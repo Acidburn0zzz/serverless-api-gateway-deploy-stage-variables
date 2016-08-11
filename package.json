@@ -1,0 +1,33 @@
+{
+  "name": "serverless-api-gateway-deploy-stage-variables",
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=4.0"
+  },
+  "description": "Serverless plugin",
+  "author": "serverless.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Brigad/serverless-api-gateway-deploy-stage-variables"
+  },
+  "keywords": [
+    "serverless framework plugin",
+    "serverless applications",
+    "serverless plugins",
+    "api gateway",
+    "lambda",
+    "aws",
+    "aws lambda",
+    "amazon",
+    "amazon web services",
+    "serverless.com"
+  ],
+  "main": "src/index.js",
+  "bin": {},
+  "dependencies": {
+    "aws-sdk": "^2.4.14",
+    "bluebird": "^3.0.6",
+    "traceur": "0.0.111"
+  }
+}
