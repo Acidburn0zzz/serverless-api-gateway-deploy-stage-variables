@@ -2,7 +2,7 @@
 
 const traceur = require('traceur');
 traceur.require.makeDefault(function(filename) {
-  return filename.indexOf('node_modules') === -1;
+  return filename.indexOf('path') === -1 || filename.indexOf('fs') || filename.indexOf('bluebird');
 }, { asyncFunctions: true });
 const APIGatewayManager = require('./aws-manager').APIGatewayManager;
 const manager = new APIGatewayManager();
