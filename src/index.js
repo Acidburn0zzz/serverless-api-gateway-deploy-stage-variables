@@ -2,10 +2,14 @@
 
 const traceur = require('traceur');
 traceur.require.makeDefault(function(filename) {
-  return filename.indexOf('path') === -1 || filename.indexOf('fs') || filename.indexOf('bluebird');
+  return filename.indexOf('serverless-api-gateway-deploy-stage-variables') !== -1
+    && filename.lastIndexOf('src') > filename.indexOf('serverless-api-gateway-deploy-stage-variables');
 }, { asyncFunctions: true });
+// ES7 Imports
 const APIGatewayManager = require('./aws-manager').APIGatewayManager;
 const manager = new APIGatewayManager();
+// !ES7 Imports
+traceur.require.makeDefault(() => false, { asyncFunctions: true });
 
 const path  = require('path'),
   fs        = require('fs'),
