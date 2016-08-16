@@ -22,8 +22,9 @@ module.exports = function(S) {
     }
 
     registerActions() {
-      S.addAction(this._customAction.bind(this), {
-        description: 'A custom action from a custom plugin',
+      S.addAction(this._deployStageVariables.bind(this), {
+        handler: 'deploySV',
+        description: 'Deploy Stage Variables',
         context: 'env',
         contextAction: 'deploy',
         options: [
@@ -37,7 +38,7 @@ module.exports = function(S) {
       return BbPromise.resolve();
     }
 
-    _customAction(evt) {
+    _deployStageVariables(evt) {
       return new BbPromise(function (resolve, reject) {
         if (evt.options.stage === true || !evt.options.stage) {
           throw new Error('Missing Stage name');
