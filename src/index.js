@@ -48,12 +48,18 @@ module.exports = function(S) {
         }
         const apiId = S.getProject().variables.api_id;
         if (!apiId) {
-          throw new Error('Please provide an api_id inside s-variables-common.json');
+          throw new Error('Please provide an api_id (s-variables-common.json)');
         }
-        const vars = S.getProject().stages[evt.options.stage].variables.stage_variables;
+        const env = S.getProject().stages[evt.options.stage].variables.environment;
+        if (!env) {
+          throw new Error(
+            `Please provide environment (s-variables-${evt.options.stage}.json)`
+          );
+        }
+        const vars = S.getProject().stages[evt.options.stage].variables.environment.stage_variables;
         if (!vars) {
           throw new Error(
-            `Please provide stage_variables inside s-variables-${evt.options.stage}.json`
+            `Please provide stage_variables inside environment (s-variables-${evt.options.stage}.json)`
           );
         }
         manager.replaceStageVariables(apiId, evt.options.stage, vars)
