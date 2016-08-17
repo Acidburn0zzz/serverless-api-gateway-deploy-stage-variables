@@ -1,6 +1,6 @@
 {
   "name": "serverless-api-gateway-deploy-stage-variables",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "engines": {
     "node": ">=4.0"
   },
