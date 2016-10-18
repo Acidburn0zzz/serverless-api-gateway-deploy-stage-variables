@@ -4,12 +4,8 @@ AWS.config.update({
   region: 'eu-central-1',
 });
 
-class AWSManager {
-}
-
-class APIGatewayManager extends AWSManager {
+class APIGatewayManager {
   constructor() {
-    super();
     this.APIGateway = new AWS.APIGateway();
   }
 
@@ -57,7 +53,4 @@ class APIGatewayManager extends AWSManager {
   }
 }
 
-export {
-  AWSManager as default,
-  APIGatewayManager,
-};
+export default APIGatewayManager;

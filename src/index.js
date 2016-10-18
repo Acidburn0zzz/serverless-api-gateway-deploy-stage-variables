@@ -1,73 +1,46 @@
-"use strict";
+import APIGatewayManager from './aws-manager';
 
-const traceur = require('traceur');
-traceur.require.makeDefault(function(filename) {
-  return filename.indexOf('serverless-api-gateway-deploy-stage-variables') !== -1
-    && filename.lastIndexOf('src') > filename.indexOf('serverless-api-gateway-deploy-stage-variables');
-}, { asyncFunctions: true });
-// ES7 Imports
-const APIGatewayManager = require('./aws-manager').APIGatewayManager;
 const manager = new APIGatewayManager();
-// !ES7 Imports
-traceur.require.makeDefault(() => false, { asyncFunctions: true });
 
-const path  = require('path'),
-  fs        = require('fs'),
-  BbPromise = require('bluebird');
-module.exports = function(S) {
-  class PluginApiGatewayStageVariables extends S.classes.Plugin {
-    constructor() {
-      super();
-      this.name = 'serverless-api-gateway-deploy-stage-variables';
-    }
+class StageVariables {
+  constructor(serverless, options) {
+    this.options = options;
+    this.serverless = serverless;
 
-    registerActions() {
-      S.addAction(this._deployStageVariables.bind(this), {
-        handler: 'deploySV',
-        description: 'Deploy Stage Variables',
-        context: 'env',
-        contextAction: 'deploy',
-        options: [
-          {
-            option: "stage",
-            shortcut: "s",
-            description: "stage you want to deploy env variables to"
-          },
-        ]
-      });
-      return BbPromise.resolve();
-    }
-
-    _deployStageVariables(evt) {
-      return new BbPromise(function (resolve, reject) {
-        if (evt.options.stage === true || !evt.options.stage) {
-          throw new Error('Missing Stage name');
-        }
-        if (!S.getProject().stages[evt.options.stage]) {
-          throw new Error('Unknown Stage name');
-        }
-        const apiId = S.getProject().variables.api_id;
-        if (!apiId) {
-          throw new Error('Please provide an api_id (s-variables-common.json)');
-        }
-        const env = S.getProject().stages[evt.options.stage].variables.environment;
-        if (!env) {
-          throw new Error(
-            `Please provide environment (s-variables-${evt.options.stage}.json)`
-          );
-        }
-        const vars = S.getProject().stages[evt.options.stage].variables.environment.stage_variables;
-        if (!vars) {
-          throw new Error(
-            `Please provide stage_variables inside environment (s-variables-${evt.options.stage}.json)`
-          );
-        }
-        manager.replaceStageVariables(apiId, evt.options.stage, vars)
-          .then(() => resolve(evt))
-          .catch(err => reject(err));
-      });
+    this.commands = {
+      ['stage-variables']: {
+        usage: 'Deploy StageVariables to AWS API Gateway',
+        lifecycleEvents: [
+          'set'
+        ],
+      },
+    };
+    this.hooks = {
+      'stage-variables:set': this.setStageVariables.bind(this)
     }
   }
-  // Export Plugin Class
-  return PluginApiGatewayStageVariables;
-};
+
+  async setStageVariables() {
+    const stage = this.options.stage || this.serverless.variables.service.defaults.stage;
+
+    if (!this.serverless.service.custom.apiGateway || !this.serverless.service.custom.apiGateway.apiId) {
+      throw new Error('Please provide an api_id (serverless.yml)');
+    } else if (!this.serverless.service.custom.apiGateway.stageVariables) {
+      throw new Error('Please set the stage variables env variable');
+    }
+
+    const { apiId } = this.serverless.service.custom.apiGateway;
+    const stageVariables = JSON.parse(this.serverless.service.custom.apiGateway.stageVariables);
+
+    try {
+      await manager.replaceStageVariables(apiId, stage, stageVariables);
+      console.log('Successfuly deployed stage variables.');
+      return true;
+    } catch (err) {
+      console.log(`Error deploying stage variables :\n${err}`);
+      return false;
+    }
+  }
+}
+
+export default StageVariables;
