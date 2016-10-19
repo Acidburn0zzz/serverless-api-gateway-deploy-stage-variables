@@ -43,4 +43,4 @@ class StageVariables {
   }
 }
 
-export default StageVariables;
+module.exports = StageVariables;
